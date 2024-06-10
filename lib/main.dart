@@ -6,6 +6,8 @@ import 'package:library_management/book_detail.dart';
 import 'package:library_management/book_repository.dart';
 import 'package:library_management/model/book.dart';
 import 'package:library_management/util/util.dart';
+import 'add_student.dart';
+import 'student_list.dart';
 
 import 'firebase_options.dart';
 
@@ -18,18 +20,15 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -37,13 +36,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Kütüphane',
-      home: BookList(),
+      home: const BookList(),
     );
   }
 }
 
 class BookList extends StatefulWidget {
-  const BookList({super.key});
+  const BookList({Key? key}) : super(key: key);
 
   @override
   State<BookList> createState() => _BookListState();
@@ -51,12 +50,62 @@ class BookList extends StatefulWidget {
 
 class _BookListState extends State<BookList> {
   var bookRepository = BookRepository();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.teal,
         title: const Text("Kitap Listesi"),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.teal,
+              ),
+              child: Text(
+                'Menü',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.book),
+              title: const Text('Kitap Listesi'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.person_add),
+              title: const Text('Öğrenci Ekleme'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AddStudent()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text('Öğrenci Listesi'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StudentListPage()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('books').snapshots(),
@@ -84,11 +133,12 @@ class _BookListState extends State<BookList> {
                   child: ListTile(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BookDetail(
-                                book: bookList[index],
-                              )));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              BookDetail(book: bookList[index]),
+                        ),
+                      );
                     },
                     title: Text(bookList[index].name!),
                   ),
@@ -137,8 +187,8 @@ class _BookListState extends State<BookList> {
                       child: TextFormField(
                         controller: authorController,
                         keyboardType: TextInputType.text,
-                        decoration:
-                        CommonDecorations.commonLoginDecoration('Yazarı'),
+                        decoration: CommonDecorations.commonLoginDecoration(
+                            'Yazarı'),
                         textAlign: TextAlign.left,
                         cursorColor: ColorConstants.bbTwoFive,
                       ),
@@ -151,9 +201,7 @@ class _BookListState extends State<BookList> {
                       value != null ? day = int.tryParse(value)! : day = 1;
                     },
                     onChangedMonth: (value) {
-                      value != null
-                          ? month = int.tryParse(value)!
-                          : month = 1;
+                      value != null ? month = int.tryParse(value)! : month = 1;
                     },
                     onChangedYear: (value) {
                       value != null
@@ -209,4 +257,3 @@ class _BookListState extends State<BookList> {
     );
   }
 }
-
